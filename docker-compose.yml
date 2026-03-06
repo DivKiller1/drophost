@@ -1,0 +1,71 @@
+services:
+
+  backend:
+    build: ./backend
+    container_name: drophost-backend
+    restart: unless-stopped
+    env_file: .env
+    ports:
+      - "8000:8000"
+    volumes:
+      - site_files:/var/sites
+      - nginx_confd:/etc/nginx/conf.d
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - internal_net
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8000/health" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  db:
+    build: ./database
+    container_name: drophost-db
+    restart: unless-stopped
+    env_file: .env
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - internal_net
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  nginx-proxy:
+    build:
+      context: .
+      dockerfile: nginx/Dockerfile
+    container_name: drophost-nginx
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    volumes:
+      - site_files:/var/sites
+      - nginx_confd:/etc/nginx/conf.d
+    networks:
+      internal_net:
+        aliases:
+          - nginx-proxy
+      drophost_macvlan:
+        ipv4_address: 10.250.0.12
+    depends_on:
+      backend:
+        condition: service_started
+
+volumes:
+  postgres_data:
+  site_files:
+  nginx_confd:
+
+
+networks:
+  internal_net:
+    driver: bridge
+  drophost_macvlan:
+    external: true

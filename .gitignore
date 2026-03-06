@@ -1,0 +1,10 @@
+.env
+node_modules/
+__pycache__/
+*.pyc
+dist/
+.pytest_cache/
+docs/screenshots/
+npm-debug.log
+.DS_Store
+
