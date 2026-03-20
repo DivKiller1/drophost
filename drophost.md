@@ -409,24 +409,6 @@ The backend mounts `/var/run/docker.sock` to allow the Node.js process to spawn 
 
 ---
 
-## 7. Conclusion
-
-| Requirement | Implementation | Status |
-|-------------|---------------|--------|
-| PostgreSQL (mandatory) | postgres:16-alpine with custom Dockerfile + init.sql schema | ✅ |
-| Node.js + Express backend | Express REST API with `/deployments`, `/health` endpoints | ✅ |
-| Separate Dockerfiles | `backend/Dockerfile` (2-stage) + `database/Dockerfile` | ✅ |
-| Multi-stage builds | Builder stage (npm ci) → Runtime stage (copy artifacts only) | ✅ |
-| Alpine / minimal base images | node:20-alpine · postgres:16-alpine · nginx:alpine | ✅ |
-| Docker Compose orchestration | 3 services · health-checked depends_on · restart policies | ✅ |
-| Named volume for PostgreSQL | `postgres_data` volume — data survives `compose down` | ✅ |
-| Macvlan networking | `drophost_macvlan` network — nginx-proxy at `10.250.0.12` | ✅ |
-| Static IP assignment | `ipv4_address: 10.250.0.12` in Compose network config | ✅ |
-| Environment variable security | `.env` file · not committed · `env_file` directive | ✅ |
-| `.dockerignore` files | backend + database both have `.dockerignore` | ✅ |
-| Healthchecks | Backend (`curl /health`) + DB (`pg_isready`) + Compose `depends_on` | ✅ |
-| Macvlan host isolation documented | Section 5.5 — screenshot + explanation of WSL2 limitation | ✅ |
-
 The key architectural insight of this project is the **dual-network pattern**: an internal bridge network provides secure, isolated service-to-service communication, while Macvlan grants the reverse proxy a genuine LAN identity. This separation of concerns is a reusable pattern applicable to any self-hosted production deployment.
 
 The multi-stage build strategy proved its value concretely: the backend image is approximately 90 MB smaller than an equivalent single-stage build, and all three Alpine-based images combined are still smaller than a single standard Debian Node.js image.
