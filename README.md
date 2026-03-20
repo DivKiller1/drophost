@@ -26,6 +26,6 @@ The dashboard should then be available on `http://192.168.1.12/` from devices on
 
 
 ## Report Link:
-![Drophost](./drophost.md)
+[Drophost](./drophost.md)
 
 
