@@ -24,3 +24,10 @@ docker compose up --build
 
 The dashboard should then be available on `http://192.168.1.12/` from devices on the same LAN.
 
+
+## Report
+![Drophost](./drophost.md)
+
+## Report Link:
+
+
