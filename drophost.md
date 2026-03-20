@@ -293,7 +293,7 @@ IPvlan takes a different approach: all containers **share the parent NIC's MAC a
 docker network inspect drophost_macvlan
 ```
 
-![docker network inspect drophost_macvlan](docs/screenshots/Screenshot%202026-03-20%20090717.png)
+![docker network inspect drophost_macvlan](doc/screenshots/Screenshot%202026-03-20%20090717.png)
 
 > Shows: Macvlan driver · subnet `10.250.0.0/24` · gateway `10.250.0.1` · parent `eth0` · nginx-proxy container attached at `10.250.0.12`
 
@@ -308,11 +308,11 @@ docker inspect drophost-db      | grep IPAddress
 docker inspect drophost-nginx   | grep IPAddress
 ```
 
-![docker ps — all containers running](docs/screenshots/Screenshot%202026-03-20%20090730.png)
+![docker ps — all containers running](doc/screenshots/Screenshot%202026-03-20%20090730.png)
 
 > Shows: `drophost-nginx`, `drophost-backend`, `drophost-db` — all Up and healthy alongside other running containers on the system
 
-![docker inspect drophost-nginx — IP addresses](docs/screenshots/Screenshot%202026-03-20%20090702.png)
+![docker inspect drophost-nginx — IP addresses](doc/screenshots/Screenshot%202026-03-20%20090702.png)
 
 > `drophost-nginx` → `172.20.0.4` (internal_net) + `10.250.0.12` (drophost_macvlan) — dual network attachment confirmed
 
@@ -337,7 +337,7 @@ docker exec -it drophost-db psql -U drophost_user -d drophost -c \
   "SELECT name, slot, status FROM deployments;"
 ```
 
-![Volume persistence test — compose down and SELECT after restart](docs/screenshots/Screenshot%202026-03-20%20090543.png)
+![Volume persistence test — compose down and SELECT after restart](doc/screenshots/Screenshot%202026-03-20%20090543.png)
 
 > Shows: `docker compose down` removing all containers and networks → `docker compose up -d` recreating them → `SELECT` returning 3 rows (`hero site`, `TEST SITE_01`, `test-site`) all with status `live` — confirming `postgres_data` volume persistence across full container lifecycle.
 
@@ -347,19 +347,19 @@ docker exec -it drophost-db psql -U drophost_user -d drophost -c \
 
 Dashboard accessible at `http://localhost:8080`:
 
-![DropHost dashboard — Analytics tab](docs/screenshots/Screenshot%202026-03-20%20090744.png)
+![DropHost dashboard — Analytics tab](doc/screenshots/Screenshot%202026-03-20%20090744.png)
 
 > Analytics tab: Total deployments: 4 · Live: 4 · Expired: 0
 
-![DropHost dashboard — Deployments list](docs/screenshots/Screenshot%202026-03-20%20090805.png)
+![DropHost dashboard — Deployments list](doc/screenshots/Screenshot%202026-03-20%20090805.png)
 
 > Deployments list — `divyanshu_CandD(1)`, `test-site`, `TEST SITE_01`, `hero site` — all Live with LAN URLs at `http://10.250.0.12/d/{slot}/`
 
-![DropHost dashboard — Deploy tab with live deployment](docs/screenshots/Screenshot%202026-03-20%20090825.png)
+![DropHost dashboard — Deploy tab with live deployment](doc/screenshots/Screenshot%202026-03-20%20090825.png)
 
 > Deploy tab — `divyanshu_CandD(1)` successfully deployed to `http://10.250.0.12/d/divyanshu-candd-1/`
 
-![Deployed site — Divyanshu Gaur student card](docs/screenshots/Screenshot%202026-03-20%20090847.png)
+![Deployed site — Divyanshu Gaur student card](doc/screenshots/Screenshot%202026-03-20%20090847.png)
 
 > The deployed static site live at `http://localhost:8080/d/divyanshu-candd-1/` — showing student card: Divyanshu Gaur · SAP: 500121752 · Batch-1 CCVT
 
@@ -369,7 +369,7 @@ Dashboard accessible at `http://localhost:8080`:
 
 Dashboard **not** accessible at `http://10.250.0.12` from the host machine:
 
-![Macvlan host isolation — ERR_CONNECTION_TIMED_OUT](docs/screenshots/Screenshot%202026-03-20%20090418.png)
+![Macvlan host isolation — ERR_CONNECTION_TIMED_OUT](doc/screenshots/Screenshot%202026-03-20%20090418.png)
 
 > `ERR_CONNECTION_TIMED_OUT` on `http://10.250.0.12/d/divyanshu-candd-1/` — expected behaviour. The host NIC cannot communicate with its own Macvlan children (kernel-level restriction). The Macvlan IP is reachable from other LAN devices but not from the same host that created the network. On WSL2/Hyper-V this limitation is further compounded by the hypervisor's virtual NIC layer.
 
